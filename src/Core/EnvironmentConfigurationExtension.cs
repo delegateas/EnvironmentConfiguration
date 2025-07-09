@@ -18,7 +18,7 @@ public static class EnvironmentConfigurationExtension
     /// <param name="configuration">Configuration Manager.</param>
     /// <param name="applicationName">Application name.</param>
     /// <param name="applicationDescription">Application description.</param>
-    /// <param name="managedIdentityResourceId">Resource Identifier if using user assigned managed identity.</param>
+    /// <param name="managedIdentityResourceIdFunc">Resource Identifier if using user assigned managed identity.</param>
     /// <returns>Environment Configuration</returns>
     /// <exception cref="NotSupportedException">If RuntimeEnvironment is unsupported.</exception>
     /// <exception cref="ArgumentException">If AZ is not authenticated.</exception>
@@ -27,7 +27,7 @@ public static class EnvironmentConfigurationExtension
         ConfigurationManager configuration,
         string applicationName,
         string applicationDescription = "N/A",
-        ResourceIdentifier? managedIdentityResourceId = null)
+        Func<EnvironmentConfiguration, ResourceIdentifier>? managedIdentityResourceIdFunc = null)
     {
         var environmentConfiguration =
             GetEnvironmentConfiguration(configuration, applicationName, applicationDescription);
@@ -38,9 +38,9 @@ public static class EnvironmentConfigurationExtension
             {
                 TenantId = environmentConfiguration.TenantId,
             }),
-            RuntimeEnvironment.Cloud when managedIdentityResourceId is not null => new ManagedIdentityCredential(
-                managedIdentityResourceId),
-            RuntimeEnvironment.Cloud when managedIdentityResourceId is null => new ManagedIdentityCredential(),
+            RuntimeEnvironment.Cloud when managedIdentityResourceIdFunc is not null => new ManagedIdentityCredential(
+                managedIdentityResourceIdFunc(environmentConfiguration)),
+            RuntimeEnvironment.Cloud when managedIdentityResourceIdFunc is null => new ManagedIdentityCredential(),
             RuntimeEnvironment.UnitTest => new TokenCredentialMock(),
             _ => throw new NotSupportedException(
                 $"Runtime environment {environmentConfiguration.RuntimeEnvironment} is not supported"),
