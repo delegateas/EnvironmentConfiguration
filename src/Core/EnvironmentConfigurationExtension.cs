@@ -17,18 +17,23 @@ public static class EnvironmentConfigurationExtension
     /// <param name="services">DI Service Collection.</param>
     /// <param name="configuration">Configuration Manager.</param>
     /// <param name="applicationName">Application name.</param>
+    /// <param name="keyVaultUriFunc">Function to build key vault Uri based in contemporary environment configuration.</param>
     /// <param name="applicationDescription">Application description.</param>
-    /// <param name="managedIdentityResourceIdFunc">Resource Identifier if using user assigned managed identity.</param>
+    /// <param name="managedIdentityResourceIdFunc">Function to build managed identity resource id based in contemporary environment configuration.</param>
     /// <returns>Environment Configuration</returns>
     /// <exception cref="NotSupportedException">If RuntimeEnvironment is unsupported.</exception>
     /// <exception cref="ArgumentException">If AZ is not authenticated.</exception>
+    /// <exception cref="InvalidOperationException">When environment variables are missing.</exception>
     public static EnvironmentConfiguration AddEnvironmentConfiguration(
         this IServiceCollection services,
         ConfigurationManager configuration,
         string applicationName,
+        Func<EnvironmentConfiguration, Uri> keyVaultUriFunc,
         string applicationDescription = "N/A",
         Func<EnvironmentConfiguration, ResourceIdentifier>? managedIdentityResourceIdFunc = null)
     {
+        ArgumentNullException.ThrowIfNull(keyVaultUriFunc);
+
         var environmentConfiguration =
             GetEnvironmentConfiguration(configuration, applicationName, applicationDescription);
 
@@ -49,10 +54,7 @@ public static class EnvironmentConfigurationExtension
         if (environmentConfiguration.RuntimeEnvironment is
             RuntimeEnvironment.LocalDeveloperMachine or RuntimeEnvironment.Cloud)
         {
-            var keuVaultUri = configuration["ApplicationConfiguration:KeyVaultUri"];
-            ArgumentNullException.ThrowIfNull(keuVaultUri);
-
-            configuration.AddAzureKeyVault(new Uri(keuVaultUri), credential);
+            configuration.AddAzureKeyVault(keyVaultUriFunc(environmentConfiguration), credential);
 
             services.AddAzureClients(configure => configure.UseCredential(credential));
         }
@@ -108,11 +110,11 @@ public static class EnvironmentConfigurationExtension
         Console.WriteLine($"   Infrastructure environment: {infrastructureEnvironment}");
         Console.WriteLine($"   Runtime environment: {runtimeEnvironment}");
 
-        var tenantId = configuration["ApplicationConfiguration:TenantId"];
-        ArgumentNullException.ThrowIfNull(tenantId);
+        var tenantId = configuration["ApplicationConfiguration:TenantId"]
+                       ?? throw new InvalidOperationException("ApplicationConfiguration:TenantId is not set.");
 
-        var resourceGroupName = configuration["ApplicationConfiguration:ResourceGroupName"];
-        ArgumentNullException.ThrowIfNull(resourceGroupName);
+        var resourceGroupName = configuration["ApplicationConfiguration:ResourceGroupName"] ??
+                                throw new InvalidOperationException("ApplicationConfiguration:ResourceGroupName is not set.");
 
         configuration.AddJsonFile("appsettings.json", optional: true)
             .AddJsonFile($"appsettings.{applicationEnvironment}.json", optional: true);
