@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <PackageId>Delegateas.EnvironmentConfiguration</PackageId>
+        <Authors>thygesteffensen;delegateas</Authors>
+        <RootNamespace>Delegateas.EnvironmentConfiguration.Core</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.3.0"/>
+        <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.4.0"/>
+        <PackageReference Include="Azure.Core" Version="1.46.2"/>
+        <PackageReference Include="Azure.Identity" Version="1.14.1"/>
+        <PackageReference Include="Microsoft.Extensions.Azure" Version="1.12.0"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.7"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.7"/>
+        <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.12.1"/>
+    </ItemGroup>
+
+</Project>
