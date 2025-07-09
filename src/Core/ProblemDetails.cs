@@ -1,3 +1,3 @@
-﻿namespace Delegateas.EnvironmentConfiguration.Core;
+﻿namespace Delegateas.DeveloperExperience.Core;
 
 public record ProblemDetails(string Type, string Title, dynamic Details);

@@ -1,6 +1,6 @@
 using Azure.Core;
 
-namespace Delegateas.EnvironmentConfiguration.Core;
+namespace Delegateas.DeveloperExperience.Core;
 
 public class TokenCredentialMock : TokenCredential
 {

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Delegateas.EnvironmentConfiguration.Core;
+namespace Delegateas.DeveloperExperience.Core;
 
 public static class JsonDefaults
 {

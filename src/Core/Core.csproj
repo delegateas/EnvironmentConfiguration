@@ -5,9 +5,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
-        <PackageId>Delegateas.EnvironmentConfiguration</PackageId>
+        <PackageId>Delegateas.DeveloperExperience</PackageId>
         <Authors>thygesteffensen;delegateas</Authors>
-        <RootNamespace>Delegateas.EnvironmentConfiguration.Core</RootNamespace>
+        <RootNamespace>Delegateas.DeveloperExperience.Core</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

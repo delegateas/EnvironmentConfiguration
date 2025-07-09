@@ -1,7 +1,7 @@
 using Azure.Core;
-using Delegateas.EnvironmentConfiguration.Core.Enums;
+using Delegateas.DeveloperExperience.Core.Enums;
 
-namespace Delegateas.EnvironmentConfiguration.Core;
+namespace Delegateas.DeveloperExperience.Core;
 
 public record EnvironmentConfiguration(
     string Name,

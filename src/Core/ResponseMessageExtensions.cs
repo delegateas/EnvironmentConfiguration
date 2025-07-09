@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 
-namespace Delegateas.EnvironmentConfiguration.Core;
+namespace Delegateas.DeveloperExperience.Core;
 
 public static class ResponseMessageExtensions
 {

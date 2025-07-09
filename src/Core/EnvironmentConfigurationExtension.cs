@@ -1,13 +1,13 @@
 using System.Globalization;
 using Azure.Core;
 using Azure.Identity;
-using Delegateas.EnvironmentConfiguration.Core.Enums;
+using Delegateas.DeveloperExperience.Core.Enums;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Delegateas.EnvironmentConfiguration.Core;
+namespace Delegateas.DeveloperExperience.Core;
 
 public static class EnvironmentConfigurationExtension
 {

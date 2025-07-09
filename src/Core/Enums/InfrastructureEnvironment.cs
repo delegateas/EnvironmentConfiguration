@@ -1,4 +1,4 @@
-namespace Delegateas.EnvironmentConfiguration.Core.Enums;
+namespace Delegateas.DeveloperExperience.Core.Enums;
 
 public enum InfrastructureEnvironment
 {

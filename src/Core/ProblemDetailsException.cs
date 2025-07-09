@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Delegateas.EnvironmentConfiguration.Core;
+namespace Delegateas.DeveloperExperience.Core;
 
 #pragma warning disable CA1032
 public class ProblemDetailsException(HttpStatusCode statusCode, ProblemDetails problemDetails) : Exception
