@@ -1,0 +1,64 @@
+name: Build and Publish NuGet
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install GitVersion
+        uses: GitTools/actions/gitversion/setup@v0.10.2
+        with:
+          versionSpec: '5.x'
+
+      - name: Run GitVersion
+        id: gitversion
+        uses: GitTools/actions/gitversion/execute@v0.10.2
+
+      - name: Check if version changed
+        id: version_check
+        run: |
+          echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+          if [ "${{ steps.gitversion.outputs.CommitDate }}" = "" ]; then
+            echo "No new version, skipping."
+            echo "##[set-output name=changed;]false"
+          else
+            echo "New version detected."
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build
+        if: steps.version_check.outputs.changed == 'true'
+        run: dotnet build -c Release
+        working-directory: src
+
+      - name: Pack
+        if: steps.version_check.outputs.changed == 'true'
+        run: dotnet pack -c Release /p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersionV2 }} -o nupkg
+        working-directory: src
+
+      - name: Push to NuGet
+        if: steps.version_check.outputs.changed == 'true'
+        run: dotnet nuget push "nupkg/*.nupkg" -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        working-directory: src
+        
+      - name: Tag
+        if: steps.version_check.outputs.changed == 'true'
+        run: |
+          git tag ${{ steps.gitversion.outputs.semVer }}
+          git push origin ${{ steps.gitversion.outputs.semVer }}
+
