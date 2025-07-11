@@ -12,8 +12,13 @@ var configuration = builder.Configuration;
 
 var environmentConfiguration = services.AddEnvironmentConfiguration(
     configuration,
-    applicationName: "CeAdapter",
-    applicationDescription: "CE Adapter Service Bus Worker");
+    applicationName: "CEAdapter",
+    keyVaultUriFunc: ec => new Uri($"https://ceadapter-{ec.InfrastructureEnvironment}-kv.vault.azure.net/"),
+    resourceGroupNameFunc: ec => $"ceadapter-{ec.InfrastructureEnvironment}-rg",
+    applicationDescription: "CE Adapter Service Bus Worker",
+    managedIdentityResourceIdFunc: ec =>
+        ResourceIdentifier.Parse(
+            $"/subscriptions/{ec.SubscriptionId}/resourceGroups/{ec.ResourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ceadapter-{ec.InfrastructureEnvironment}-uami-01") );
 ```
 
 This is the core library for the KL.CEAdapter project, which provides functionality for configuring the
