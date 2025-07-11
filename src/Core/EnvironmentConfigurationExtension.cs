@@ -13,11 +13,17 @@ public static class EnvironmentConfigurationExtension
 {
     /// <summary>
     /// Configures and adds the environment configuration to the service collection.
+    /// This expects the following values to be present in the ConfigurationManager, preferably automatically through
+    /// appsettings.*.json.
+    ///   * ApplicationConfiguration.TenantId: Used to populate TenantId in EnvironmentConfiguration
+    ///   * ApplicationConfiguration.SubscriptionId: Used to populate TenantId in EnvironmentConfiguration
+    /// Neither of the two values can be calculataed.
     /// </summary>
     /// <param name="services">DI Service Collection.</param>
     /// <param name="configuration">Configuration Manager.</param>
     /// <param name="applicationName">Application name.</param>
     /// <param name="keyVaultUriFunc">Function to build key vault Uri based in contemporary environment configuration.</param>
+    /// <param name="resourceGroupNameFunc">Function to build resource group name based in contemporary environment configuration.</param>
     /// <param name="applicationDescription">Application description.</param>
     /// <param name="managedIdentityResourceIdFunc">Function to build managed identity resource id based in contemporary environment configuration.</param>
     /// <returns>Environment Configuration</returns>
@@ -29,13 +35,19 @@ public static class EnvironmentConfigurationExtension
         ConfigurationManager configuration,
         string applicationName,
         Func<EnvironmentConfiguration, Uri> keyVaultUriFunc,
+        Func<EnvironmentConfiguration, string> resourceGroupNameFunc,
         string applicationDescription = "N/A",
         Func<EnvironmentConfiguration, ResourceIdentifier>? managedIdentityResourceIdFunc = null)
     {
         ArgumentNullException.ThrowIfNull(keyVaultUriFunc);
+        ArgumentNullException.ThrowIfNull(resourceGroupNameFunc);
 
         var environmentConfiguration =
             GetEnvironmentConfiguration(configuration, applicationName, applicationDescription);
+        environmentConfiguration = environmentConfiguration with
+        {
+            ResourceGroupName = resourceGroupNameFunc(environmentConfiguration),
+        };
 
         TokenCredential credential = environmentConfiguration.RuntimeEnvironment switch
         {
@@ -113,9 +125,6 @@ public static class EnvironmentConfigurationExtension
         var tenantId = configuration["ApplicationConfiguration:TenantId"]
                        ?? throw new InvalidOperationException("ApplicationConfiguration:TenantId is not set.");
 
-        var resourceGroupName = configuration["ApplicationConfiguration:ResourceGroupName"] ??
-                                throw new InvalidOperationException("ApplicationConfiguration:ResourceGroupName is not set.");
-
         configuration.AddJsonFile("appsettings.json", optional: true)
             .AddJsonFile($"appsettings.{applicationEnvironment}.json", optional: true);
 
@@ -130,7 +139,7 @@ public static class EnvironmentConfigurationExtension
             RuntimeEnvironment: runtimeEnvironment,
             TenantId: tenantId,
             SubscriptionId: subscriptionId,
-            ResourceGroupName: resourceGroupName);
+            ResourceGroupName: null!);
 
         return environmentConfiguration;
     }
