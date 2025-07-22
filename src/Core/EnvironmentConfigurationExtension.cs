@@ -103,7 +103,7 @@ public static class EnvironmentConfigurationExtension
 
         // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-9.0&tabs=basicconfiguration#configuration-providers
         var applicationEnvironment =
-            (configuration["ASPNETCORE_ENVIRONMENT"] ?? "development").ToLower(CultureInfo.InvariantCulture);
+            (configuration["ASPNETCORE_ENVIRONMENT"] ?? "local").ToLower(CultureInfo.InvariantCulture);
 
         Enum.TryParse<InfrastructureEnvironment>(
             configuration["INFRASTRUCTURE_ENVIRONMENT"],
