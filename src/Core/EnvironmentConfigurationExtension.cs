@@ -17,7 +17,7 @@ public static class EnvironmentConfigurationExtension
     /// appsettings.*.json.
     ///   * ApplicationConfiguration.TenantId: Used to populate TenantId in EnvironmentConfiguration
     ///   * ApplicationConfiguration.SubscriptionId: Used to populate TenantId in EnvironmentConfiguration
-    /// Neither of the two values can be calculataed.
+    /// Neither of the two values can be calculated.
     /// </summary>
     /// <param name="services">DI Service Collection.</param>
     /// <param name="configuration">Configuration Manager.</param>
