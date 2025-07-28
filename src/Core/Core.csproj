@@ -8,6 +8,9 @@
         <PackageId>Delegateas.DeveloperExperience</PackageId>
         <Authors>thygesteffensen;delegateas</Authors>
         <RootNamespace>Delegateas.DeveloperExperience.Core</RootNamespace>
+
+        <DebugType>Embedded</DebugType>
+        <EmbedAllSources>True</EmbedAllSources>
     </PropertyGroup>
 
     <ItemGroup>
