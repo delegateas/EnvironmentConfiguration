@@ -44,6 +44,7 @@ public static class EnvironmentConfigurationExtension
 
         var environmentConfiguration =
             GetEnvironmentConfiguration(configuration, applicationName, applicationDescription);
+
         environmentConfiguration = environmentConfiguration with
         {
             ResourceGroupName = resourceGroupNameFunc(environmentConfiguration),
@@ -102,8 +103,15 @@ public static class EnvironmentConfigurationExtension
         ArgumentNullException.ThrowIfNull(applicationName);
 
         // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-9.0&tabs=basicconfiguration#configuration-providers
+        // The ASPNETCORE_ENVIRONMENT variable is set by the ASP.NET Core hosting environment.
         var applicationEnvironment =
             (configuration["ASPNETCORE_ENVIRONMENT"] ?? "local").ToLower(CultureInfo.InvariantCulture);
+
+        configuration
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddJsonFile($"appsettings.{applicationEnvironment}.json", optional: true);
+
+        configuration.AddEnvironmentVariables();
 
         Enum.TryParse<InfrastructureEnvironment>(
             configuration["INFRASTRUCTURE_ENVIRONMENT"],
@@ -125,10 +133,6 @@ public static class EnvironmentConfigurationExtension
         var tenantId = configuration["ApplicationConfiguration:TenantId"]
                        ?? throw new InvalidOperationException("ApplicationConfiguration:TenantId is not set.");
 
-        configuration.AddJsonFile("appsettings.json", optional: true)
-            .AddJsonFile($"appsettings.{applicationEnvironment}.json", optional: true);
-
-        configuration.AddEnvironmentVariables();
         var subscriptionId = configuration["ApplicationConfiguration:SubscriptionId"] ?? "N/A";
 
         var environmentConfiguration = new EnvironmentConfiguration(
