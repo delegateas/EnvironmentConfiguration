@@ -78,24 +78,7 @@ public static class EnvironmentConfigurationExtension
                 new TokenRequestContext(["https://graph.microsoft.com/.default"]),
                 CancellationToken.None);
 
-            // Should be UPN, but guest accounts does not have UPN, so we use email instead.
-            var webToken = new JsonWebToken(accessToken.Token);
-            string developerInitials;
-
-            if (webToken.TryGetPayloadValue("upn", out string upn))
-            {
-                developerInitials = upn.Split('@').FirstOrDefault() ??
-                                    throw new ArgumentException($"Invalid developer upn {upn}", upn);
-            }
-            else if (webToken.TryGetPayloadValue("email", out string email))
-            {
-                developerInitials = email.Split('@').FirstOrDefault() ??
-                                    throw new ArgumentException($"Invalid developer email {email}", email);
-            }
-            else
-            {
-                throw new InvalidOperationException("JWT token does not contain either UPN or email...");
-            }
+            var developerInitials = ExtractDeveloperInitials(accessToken);
 
             environmentConfiguration = environmentConfiguration with { ApplicationEnvironment = developerInitials };
         }
@@ -107,6 +90,30 @@ public static class EnvironmentConfigurationExtension
             .AddSingleton(configuration);
 
         return environmentConfiguration;
+    }
+
+    private static string ExtractDeveloperInitials(AccessToken accessToken)
+    {
+        // Should be UPN, but guest accounts does not have UPN, so we use email instead.
+        var webToken = new JsonWebToken(accessToken.Token);
+        string developerInitials;
+
+        if (webToken.TryGetPayloadValue("upn", out string upn))
+        {
+            developerInitials = upn.Split('@').FirstOrDefault() ??
+                                throw new ArgumentException($"Invalid developer upn {upn}", upn);
+        }
+        else if (webToken.TryGetPayloadValue("email", out string email))
+        {
+            developerInitials = email.Split('@').FirstOrDefault() ??
+                                throw new ArgumentException($"Invalid developer email {email}", email);
+        }
+        else
+        {
+            throw new InvalidOperationException("JWT token does not contain either UPN or email...");
+        }
+
+        return developerInitials;
     }
 
     private static EnvironmentConfiguration GetEnvironmentConfiguration(
