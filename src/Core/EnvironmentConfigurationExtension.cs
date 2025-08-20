@@ -79,9 +79,24 @@ public static class EnvironmentConfigurationExtension
                 CancellationToken.None);
 
             // Should be UPN, but guest accounts does not have UPN, so we use email instead.
-            var developerUpn = new JsonWebToken(accessToken.Token).GetPayloadValue<string>("email");
-            var developerInitials = developerUpn.Split('@').FirstOrDefault() ??
-                                    throw new ArgumentException($"Invalid developer upn {developerUpn}", developerUpn);
+            var webToken = new JsonWebToken(accessToken.Token);
+            string developerInitials;
+
+            if (webToken.TryGetPayloadValue("upn", out string upn))
+            {
+                developerInitials = upn.Split('@').FirstOrDefault() ??
+                                    throw new ArgumentException($"Invalid developer upn {upn}", upn);
+            }
+            else if (webToken.TryGetPayloadValue("email", out string email))
+            {
+                developerInitials = email.Split('@').FirstOrDefault() ??
+                                    throw new ArgumentException($"Invalid developer email {email}", email);
+            }
+            else
+            {
+                throw new InvalidOperationException("JWT token does not contain either UPN or email...");
+            }
+
             environmentConfiguration = environmentConfiguration with { ApplicationEnvironment = developerInitials };
         }
 
