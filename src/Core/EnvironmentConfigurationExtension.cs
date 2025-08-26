@@ -60,11 +60,10 @@ public static class EnvironmentConfigurationExtension
                 managedIdentityResourceIdFunc(environmentConfiguration)),
             RuntimeEnvironment.Cloud when managedIdentityResourceIdFunc is null => new ManagedIdentityCredential(),
             RuntimeEnvironment.UnitTest => new TokenCredentialMock(),
-            RuntimeEnvironment.BuildServer => new AzurePipelinesCredential(
-                tenantId: Environment.GetEnvironmentVariable("APP_REG_TENANT_ID") ?? throw new InvalidOperationException("APP_REG_TENANT_ID environment variable is not set."),
-                clientId: Environment.GetEnvironmentVariable("APP_REG_CLIENT_ID") ?? throw new InvalidOperationException("APP_REG_CLIENT_ID environment variable is not set."),
-                serviceConnectionId: Environment.GetEnvironmentVariable("APP_REG_SERVICE_CONNECTION_ID") ?? throw new InvalidOperationException("APP_REG_SERVICE_CONNECTION_ID environment variable is not set."),
-                systemAccessToken: Environment.GetEnvironmentVariable("SYSTEM_ACCESS_TOKEN") ?? throw new InvalidOperationException("SYSTEM_ACCESS_TOKEN environment variable is not set.")),
+            RuntimeEnvironment.BuildServer => new ClientSecretCredential(
+                tenantId: Environment.GetEnvironmentVariable("AZURE_TENANT_ID") ?? throw new InvalidOperationException("AZURE_TENANT_ID environment variable is not set."),
+                clientId: Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? throw new InvalidOperationException("AZURE_CLIENT_ID environment variable is not set."),
+                clientSecret: Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") ?? throw new InvalidOperationException("AZURE_CLIENT_SECRET environment variable is not set.")),
             _ => throw new NotSupportedException(
                 $"Runtime environment {environmentConfiguration.RuntimeEnvironment} is not supported"),
         };
