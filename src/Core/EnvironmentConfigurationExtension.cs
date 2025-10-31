@@ -22,8 +22,8 @@ public static class EnvironmentConfigurationExtension
     /// <param name="services">DI Service Collection.</param>
     /// <param name="configuration">Configuration Manager.</param>
     /// <param name="applicationName">Application name.</param>
-    /// <param name="keyVaultUriFunc">Function to build key vault Uri based in contemporary environment configuration.</param>
     /// <param name="resourceGroupNameFunc">Function to build resource group name based in contemporary environment configuration.</param>
+    /// <param name="keyVaultUriFunc">Function to build key vault Uri based in contemporary environment configuration.</param>
     /// <param name="applicationDescription">Application description.</param>
     /// <param name="managedIdentityResourceIdFunc">Function to build managed identity resource id based in contemporary environment configuration.</param>
     /// <returns>Environment Configuration</returns>
@@ -34,12 +34,11 @@ public static class EnvironmentConfigurationExtension
         this IServiceCollection services,
         ConfigurationManager configuration,
         string applicationName,
-        Func<EnvironmentConfiguration, Uri> keyVaultUriFunc,
         Func<EnvironmentConfiguration, string> resourceGroupNameFunc,
+        Func<EnvironmentConfiguration, Uri>? keyVaultUriFunc = null,
         string applicationDescription = "N/A",
         Func<EnvironmentConfiguration, ResourceIdentifier>? managedIdentityResourceIdFunc = null)
     {
-        ArgumentNullException.ThrowIfNull(keyVaultUriFunc);
         ArgumentNullException.ThrowIfNull(resourceGroupNameFunc);
 
         var environmentConfiguration =
@@ -69,7 +68,8 @@ public static class EnvironmentConfigurationExtension
         };
 
         if (environmentConfiguration.RuntimeEnvironment is
-            RuntimeEnvironment.LocalDeveloperMachine or RuntimeEnvironment.Cloud)
+            RuntimeEnvironment.LocalDeveloperMachine or RuntimeEnvironment.Cloud
+            && keyVaultUriFunc is not null)
         {
             configuration.AddAzureKeyVault(keyVaultUriFunc(environmentConfiguration), credential);
 
