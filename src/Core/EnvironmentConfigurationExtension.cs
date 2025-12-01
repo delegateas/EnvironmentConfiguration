@@ -23,9 +23,10 @@ public static class EnvironmentConfigurationExtension
     /// <param name="configuration">Configuration Manager.</param>
     /// <param name="applicationName">Application name.</param>
     /// <param name="resourceGroupNameFunc">Function to build resource group name based in contemporary environment configuration.</param>
-    /// <param name="keyVaultUriFunc">Function to build key vault Uri based in contemporary environment configuration.</param>
     /// <param name="applicationDescription">Application description.</param>
     /// <param name="managedIdentityResourceIdFunc">Function to build managed identity resource id based in contemporary environment configuration.</param>
+    /// <param name="keyVaultUriFuncs">Function to build key vault URIs based in contemporary environment configuration.
+    ///                                Secrets with the same key is overwritten by later URIs.</param>
     /// <returns>Environment Configuration</returns>
     /// <exception cref="NotSupportedException">If RuntimeEnvironment is unsupported.</exception>
     /// <exception cref="ArgumentException">If AZ is not authenticated.</exception>
@@ -35,9 +36,9 @@ public static class EnvironmentConfigurationExtension
         ConfigurationManager configuration,
         string applicationName,
         Func<EnvironmentConfiguration, string> resourceGroupNameFunc,
-        Func<EnvironmentConfiguration, Uri>? keyVaultUriFunc = null,
         string applicationDescription = "N/A",
-        Func<EnvironmentConfiguration, ResourceIdentifier>? managedIdentityResourceIdFunc = null)
+        Func<EnvironmentConfiguration, ResourceIdentifier>? managedIdentityResourceIdFunc = null,
+        params ICollection<Func<EnvironmentConfiguration, Uri>>? keyVaultUriFuncs)
     {
         ArgumentNullException.ThrowIfNull(resourceGroupNameFunc);
 
@@ -69,9 +70,12 @@ public static class EnvironmentConfigurationExtension
 
         if (environmentConfiguration.RuntimeEnvironment is
             RuntimeEnvironment.LocalDeveloperMachine or RuntimeEnvironment.Cloud
-            && keyVaultUriFunc is not null)
+            && keyVaultUriFuncs is not null)
         {
-            configuration.AddAzureKeyVault(keyVaultUriFunc(environmentConfiguration), credential);
+            foreach (var keyVaultUriFunc in keyVaultUriFuncs)
+            {
+                configuration.AddAzureKeyVault(keyVaultUriFunc(environmentConfiguration), credential);
+            }
 
             services.AddAzureClients(configure => configure.UseCredential(credential));
         }
