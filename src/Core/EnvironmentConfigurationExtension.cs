@@ -137,16 +137,14 @@ public static class EnvironmentConfigurationExtension
         var applicationEnvironment =
             (configuration["ASPNETCORE_ENVIRONMENT"] ?? "local").ToLower(CultureInfo.InvariantCulture);
 
+        var infrastructureEnvironment =
+            (configuration["INFRASTRUCTURE_ENVIRONMENT"] ?? "dev").ToLower(CultureInfo.InvariantCulture);
+
         configuration
             .AddJsonFile("appsettings.json", optional: true)
             .AddJsonFile($"appsettings.{applicationEnvironment}.json", optional: true);
 
         configuration.AddEnvironmentVariables();
-
-        Enum.TryParse<InfrastructureEnvironment>(
-            configuration["INFRASTRUCTURE_ENVIRONMENT"],
-            ignoreCase: true,
-            out var infrastructureEnvironment); // Defaults to Dev
 
         Enum.TryParse<RuntimeEnvironment>(
             configuration["RUNTIME_ENVIRONMENT"],

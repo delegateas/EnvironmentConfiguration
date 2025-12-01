@@ -6,7 +6,7 @@ namespace Delegateas.DeveloperExperience.Core;
 public record EnvironmentConfiguration(
     string Name,
     string Description,
-    InfrastructureEnvironment InfrastructureEnvironment,
+    string InfrastructureEnvironment,
     string ApplicationEnvironment,
     RuntimeEnvironment RuntimeEnvironment,
     string TenantId,
