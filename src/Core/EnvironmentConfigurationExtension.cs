@@ -57,8 +57,9 @@ public static class EnvironmentConfigurationExtension
                 TenantId = environmentConfiguration.TenantId,
             }),
             RuntimeEnvironment.Cloud when managedIdentityResourceIdFunc is not null => new ManagedIdentityCredential(
-                managedIdentityResourceIdFunc(environmentConfiguration)),
-            RuntimeEnvironment.Cloud when managedIdentityResourceIdFunc is null => new ManagedIdentityCredential(),
+                ManagedIdentityId.FromUserAssignedResourceId(managedIdentityResourceIdFunc(environmentConfiguration))),
+            RuntimeEnvironment.Cloud when managedIdentityResourceIdFunc is null => new ManagedIdentityCredential(
+                new ManagedIdentityCredentialOptions()),
             RuntimeEnvironment.UnitTest => new TokenCredentialMock(),
             RuntimeEnvironment.BuildServer => new ClientSecretCredential(
                 tenantId: Environment.GetEnvironmentVariable("AZURE_TENANT_ID") ?? throw new InvalidOperationException("AZURE_TENANT_ID environment variable is not set."),
